@@ -58,7 +58,7 @@ pub struct EncodeTask {
 
 impl Task for EncodeTask {
   type Output = Vec<u8>;
-  type JsValue = JsBuffer;
+  type JsValue = Buffer;
 
   fn compute(&mut self) -> Result<Self::Output> {
     let input_ref: &[u8] = self.input.as_ref();
@@ -81,14 +81,7 @@ impl Task for EncodeTask {
   }
 
   fn resolve(&mut self, env: Env, output: Self::Output) -> Result<Self::JsValue> {
-    match env.create_buffer_with_data(output) {
-      Ok(buf_val) => {
-        return Ok(buf_val.into_raw());
-      },
-      Err(err) => {
-        return Err(err);
-      }
-    }
+    Ok(output.into())
   }
 }
 
@@ -100,7 +93,7 @@ pub struct DecodeTask {
 
 impl Task for DecodeTask {
   type Output = Vec<u8>;
-  type JsValue = JsBuffer;
+  type JsValue = Buffer;
 
   fn compute(&mut self) -> Result<Self::Output> {
     let input_ref: &[u8] = self.input.as_ref();
@@ -123,23 +116,16 @@ impl Task for DecodeTask {
   }
 
   fn resolve(&mut self, env: Env, output: Self::Output) -> Result<Self::JsValue> {
-    match env.create_buffer_with_data(output) {
-      Ok(buf_val) => {
-        return Ok(buf_val.into_raw());
-      },
-      Err(err) => {
-        return Err(err);
-      }
-    }
+    Ok(output.into())
   }
 }
 
-#[napi]
-pub fn encode(input: Buffer, window_size: u8, lookahead_size: u8, signal: Option<AbortSignal>) -> AsyncTask<EncodeTask> {
-  AsyncTask::with_optional_signal(EncodeTask { input, window_size, lookahead_size }, signal)
+#[napi(ts_return_type = "Promise<Buffer>")]
+pub fn encode(input: Buffer, window_size: u8, lookahead_size: u8, signal: Option<AbortSignal>) -> Result<AsyncTask<EncodeTask>> {
+  Ok(AsyncTask::with_optional_signal(EncodeTask { input, window_size, lookahead_size }, signal))
 }
 
-#[napi]
-pub fn decode(input: Buffer, window_size: u8, lookahead_size: u8, signal: Option<AbortSignal>) -> AsyncTask<DecodeTask> {
-  AsyncTask::with_optional_signal(DecodeTask { input, window_size, lookahead_size }, signal)
+#[napi(ts_return_type = "Promise<Buffer>")]
+pub fn decode(input: Buffer, window_size: u8, lookahead_size: u8, signal: Option<AbortSignal>) -> Result<AsyncTask<DecodeTask>> {
+  Ok(AsyncTask::with_optional_signal(DecodeTask { input, window_size, lookahead_size }, signal))
 }
