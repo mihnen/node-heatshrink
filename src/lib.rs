@@ -1,7 +1,6 @@
 #![deny(clippy::all)]
 
 use heatshrink::Config;
-use napi::JsBuffer;
 use napi::Task;
 use napi::bindgen_prelude::*;
 
@@ -80,7 +79,7 @@ impl Task for EncodeTask {
     };
   }
 
-  fn resolve(&mut self, env: Env, output: Self::Output) -> Result<Self::JsValue> {
+  fn resolve(&mut self, _env: Env, output: Self::Output) -> Result<Self::JsValue> {
     Ok(output.into())
   }
 }
@@ -115,7 +114,7 @@ impl Task for DecodeTask {
     };
   }
 
-  fn resolve(&mut self, env: Env, output: Self::Output) -> Result<Self::JsValue> {
+  fn resolve(&mut self, _env: Env, output: Self::Output) -> Result<Self::JsValue> {
     Ok(output.into())
   }
 }
