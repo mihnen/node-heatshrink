@@ -1,6 +1,9 @@
 {
   "name": "node-heatshrink-darwin-x64",
-  "version": "0.0.0",
+  "version": "0.1.6",
+  "repository": {
+    "url": "https://github.com/huming2207/node-heatshrink"
+  },
   "os": [
     "darwin"
   ],
