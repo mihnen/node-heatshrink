@@ -34,12 +34,5 @@
     "test": "ava",
     "universal": "napi universal",
     "version": "napi version"
-  },
-  "optionalDependencies": {
-    "node-heatshrink-win32-x64-msvc": "0.1.6",
-    "node-heatshrink-darwin-x64": "0.1.6",
-    "node-heatshrink-linux-x64-gnu": "0.1.6",
-    "node-heatshrink-darwin-arm64": "0.1.6",
-    "node-heatshrink-linux-x64-musl": "0.1.6"
   }
 }
