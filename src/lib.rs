@@ -17,13 +17,13 @@ pub fn encode_sync(input: Buffer, window_size: u8, lookahead_size: u8) -> Result
     }
   };
 
-  let mut output_buf: Vec<u8> = vec![0; input.len() * 2];
+  let mut output_buf: Vec<u8> = vec![0; 16 + (2 * (2 ^ input.len()))];
   match heatshrink::encode(input_ref, output_buf.as_mut_slice(), &config) {
     Ok(out) => {
       return Ok(Vec::from(out).into());
     },
-    Err(_) => {
-      return Err(Error::new(Status::GenericFailure, format!("Output buffer is too small, length: {}", output_buf.len())));
+    Err(err) => {
+      return Err(Error::new(Status::GenericFailure, format!("{:?}", err)));
     }
   };
 }
@@ -38,13 +38,13 @@ pub fn decode_sync(input: Buffer, window_size: u8, lookahead_size: u8) -> Result
     }
   };
 
-  let mut output_buf: Vec<u8> = vec![0; input.len() * 2];
+  let mut output_buf: Vec<u8> = vec![0; 16 + (2 * (2 ^ input.len()))];
   match heatshrink::decode(input_ref, output_buf.as_mut_slice(), &config) {
     Ok(out) => {
       return Ok(Vec::from(out).into());
     },
-    Err(_) => {
-      return Err(Error::new(Status::GenericFailure, format!("Output buffer is too small, length: {}", output_buf.len())));
+    Err(err) => {
+      return Err(Error::new(Status::GenericFailure, format!("{:?}", err)));
     }
   };
 }
@@ -68,13 +68,13 @@ impl Task for EncodeTask {
       }
     };
   
-    let mut output_buf: Vec<u8> = vec![0; self.input.len() * 2];
+    let mut output_buf: Vec<u8> = vec![0; 16 + (2 * (2 ^ self.input.len()))];
     match heatshrink::encode(input_ref, output_buf.as_mut_slice(), &config) {
       Ok(out) => {
         return Ok(Vec::from(out));
       },
-      Err(_) => {
-        return Err(Error::new(Status::GenericFailure, format!("Output buffer is too small, length: {}", output_buf.len())));
+      Err(err) => {
+        return Err(Error::new(Status::GenericFailure, format!("{:?}", err)));
       }
     };
   }
@@ -103,13 +103,13 @@ impl Task for DecodeTask {
       }
     };
   
-    let mut output_buf: Vec<u8> = vec![0; self.input.len() * 2];
+    let mut output_buf: Vec<u8> = vec![0; 16 + (2 * (2 ^ self.input.len()))];
     match heatshrink::decode(input_ref, output_buf.as_mut_slice(), &config) {
       Ok(out) => {
         return Ok(Vec::from(out));
       },
-      Err(_) => {
-        return Err(Error::new(Status::GenericFailure, format!("Output buffer is too small, length: {}", output_buf.len())));
+      Err(err) => {
+        return Err(Error::new(Status::GenericFailure, format!("{:?}", err)));
       }
     };
   }
