@@ -1,6 +1,6 @@
 {
   "name": "node-heatshrink",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "main": "index.js",
   "types": "index.d.ts",
   "repository": {
@@ -17,7 +17,7 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@napi-rs/cli": "^2.16.2",
+    "@napi-rs/cli": "^2.16.3",
     "ava": "^5.1.1"
   },
   "ava": {
