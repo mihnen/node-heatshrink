@@ -29,7 +29,7 @@ pub fn encode_sync(input: Buffer, window_size: u8, lookahead_size: u8) -> Result
 }
 
 #[napi]
-pub fn decode_sync(input: Buffer, window_size: u8, lookahead_size: u8) -> Result<Buffer> {
+pub fn decode_sync(input: Buffer, window_size: u8, lookahead_size: u8, output_buffer_size: Option<u32>) -> Result<Buffer> {
   let input_ref: &[u8] = input.as_ref();
   let config = match Config::new(window_size, lookahead_size) {
     Ok(cfg) => cfg,
@@ -38,7 +38,9 @@ pub fn decode_sync(input: Buffer, window_size: u8, lookahead_size: u8) -> Result
     }
   };
 
-  let mut output_buf: Vec<u8> = vec![0; 16 + (2 * (2 ^ input.len()))];
+  let initial_buffer_size = output_buffer_size.unwrap_or((16 + (2 * (2 ^ input.len()))) as u32) as usize;
+  let mut output_buf: Vec<u8> = vec![0; initial_buffer_size];
+
   match heatshrink::decode(input_ref, output_buf.as_mut_slice(), &config) {
     Ok(out) => {
       return Ok(Vec::from(out).into());
@@ -88,6 +90,7 @@ pub struct DecodeTask {
   pub(crate) input: Buffer,
   pub(crate) window_size: u8,
   pub(crate) lookahead_size: u8,
+  pub(crate) output_buffer_size: Option<u32>,
 }
 
 impl Task for DecodeTask {
@@ -102,8 +105,10 @@ impl Task for DecodeTask {
         return Err(Error::new(Status::GenericFailure, err));
       }
     };
-  
-    let mut output_buf: Vec<u8> = vec![0; 16 + (2 * (2 ^ self.input.len()))];
+
+    let initial_buffer_size = self.output_buffer_size.unwrap_or((16 + (2 * (2 ^ self.input.len()))) as u32) as usize;
+    let mut output_buf: Vec<u8> = vec![0; initial_buffer_size];
+
     match heatshrink::decode(input_ref, output_buf.as_mut_slice(), &config) {
       Ok(out) => {
         return Ok(Vec::from(out));
@@ -125,6 +130,6 @@ pub fn encode(input: Buffer, window_size: u8, lookahead_size: u8, signal: Option
 }
 
 #[napi(ts_return_type = "Promise<Buffer>")]
-pub fn decode(input: Buffer, window_size: u8, lookahead_size: u8, signal: Option<AbortSignal>) -> Result<AsyncTask<DecodeTask>> {
-  Ok(AsyncTask::with_optional_signal(DecodeTask { input, window_size, lookahead_size }, signal))
+pub fn decode(input: Buffer, window_size: u8, lookahead_size: u8, signal: Option<AbortSignal>, output_buffer_size: Option<u32>) -> Result<AsyncTask<DecodeTask>> {
+  Ok(AsyncTask::with_optional_signal(DecodeTask { input, window_size, lookahead_size, output_buffer_size }, signal))
 }
